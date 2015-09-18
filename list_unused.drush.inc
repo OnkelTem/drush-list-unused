@@ -37,19 +37,21 @@ function drush_list_unused() {
   // Get the list of all modules under sites/**
   $result = drush_db_select('system', array('filename', 'status'), 'filename like :fname', array(':fname' => 'sites%') , NULL, NULL, 'filename', 'ASC');
 
-  $modules = array();
-  $statuses = array();
-  $i = 0;
+  $paths = array();
   foreach($result as $record) {
-    $modules[$i] = dirname($record->filename);
-    $statuses[$i] = $record->status;
-    $i++;
+    $path = dirname($record->filename);
+    if (!isset($paths[$path])) {
+      $paths[$path] = $record->status;
+    }
+    else {
+      $paths[$path] = $paths[$path] || $record->status;
+    }
   }
 
   $unused = array();
-  foreach($modules as $key => $path) {
+  foreach($paths as $path => $status) {
     // Skip enabled modules
-    if ($statuses[$key]) {
+    if ($status) {
       continue;
     }
     $_path = $path;
@@ -57,7 +59,7 @@ function drush_list_unused() {
     // Search for a parent project up to the 'sites' directory in $modules array - i.e. both enabled and disabled modules
     // as to count a module 'unused' it should be a full project, not a submodule.
     while(($_path = dirname($_path)) !== 'sites') {
-      if (in_array($_path, $modules)) {
+      if (isset($paths[$_path])) {
         $submodule = TRUE;
         continue;
       }
