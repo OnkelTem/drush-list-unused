@@ -29,6 +29,13 @@ drush list-unused | while IFS= read -r line; do rm -rf "$line"; done
 ```
 But I myself haven't tried it and can't think why you may need this. Instead use the output to feed your deployment system. For example I use it to create exclude list for ```rsync``` when deploying a website.
 
+## TODO
+
+Add dependency search for:
+
+* base themes
+* libraries
+
 ## Alternatives
 
 There is [Drush Extras] (https://www.drupal.org/project/drush_extras) project on Drupal.org. It provides a set of handy drush commands including ```pm-projectinfo``` and recently was patched so that now it can list paths. Example usage:
